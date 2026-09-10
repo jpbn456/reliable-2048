@@ -184,4 +184,20 @@ public class CellTest {
         assertFalse(equals);
     }
 
+    @Test
+    void toStringTest() {
+        Cell cell = new Cell(ONE);
+        String expected = String.valueOf(ONE);
+        String actual = cell.toString();
+        assertEquals(expected,actual);
+    }
+
+    @Test
+    void toStringZeroTest() {
+        Cell cell = new Cell(ZERO);
+        String expected = ".";
+        String actual = cell.toString();
+        assertEquals(expected,actual);
+    }
+    
 }
