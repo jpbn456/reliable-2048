@@ -141,7 +141,7 @@ public class Board {
     }
 
     public void setGrid(Cell[][] grid) {
-        if (grid.length > this.grid.length) {
+        if (grid.length != this.grid.length) {
             throw new IllegalArgumentException("Grids should be of the same size");
         }
         this.grid = grid;
@@ -240,7 +240,7 @@ public class Board {
             for (int c = 0; c < size; c++) {
                 Cell current = grid[r][c];
                 // Check right neighbor
-                if (c + 1 < size - 1 && current.canMergeWith(grid[r][c + 1])) {
+                if (c + 1 < size && current.canMergeWith(grid[r][c + 1])) {
                     return false;
                 }
                 // Check down neighbor

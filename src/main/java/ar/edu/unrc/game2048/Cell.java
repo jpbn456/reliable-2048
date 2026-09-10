@@ -32,7 +32,7 @@ public final class Cell {
     public Cell(int value) {
         if (value < 0) {
             throw new IllegalArgumentException("Cell value cannot be negative: " + value);
-        } else if (value > 0 && (value & (value - 1)) != 0) {
+        } else if ((value & (value - 1)) != 0) {
             throw new IllegalArgumentException("Cells must be either 0 or a power of two");
         }
         this.value = value;
