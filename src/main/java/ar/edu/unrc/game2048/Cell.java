@@ -126,4 +126,8 @@ public final class Cell {
     public String toString() {
         return value == 0 ? "." : String.valueOf(value);
     }
+
+    public boolean repOk() {
+        return value >= 0 && (value == 0 || (value & (value - 1)) == 0);
+    }
 }
