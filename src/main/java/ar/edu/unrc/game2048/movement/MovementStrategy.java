@@ -5,6 +5,7 @@ import ar.edu.unrc.game2048.Cell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class MovementStrategy {
 
@@ -23,7 +24,7 @@ public abstract class MovementStrategy {
     public abstract boolean move(Board board);
 
     protected List<Cell> removeEmptyCells(List<Cell> column) {
-        return column.stream().filter(cell -> !cell.isEmpty()).toList();
+        return column.stream().filter(cell -> !cell.isEmpty()).collect(Collectors.toList());
     }
 
     protected List<Cell> mergedCells(List<Cell> merged) {

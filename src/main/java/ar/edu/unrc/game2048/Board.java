@@ -3,9 +3,12 @@ package ar.edu.unrc.game2048;
 import ar.edu.unrc.game2048.movement.Direction;
 import ar.edu.unrc.game2048.movement.MovementSolver;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -38,6 +41,11 @@ public class Board {
     private final int size;
 
     /**
+     * Source of randomness for initial and post-move tiles.
+     */
+    private final Random random;
+
+    /**
      * Contents of the board: a 2D array of Cells. grid[row][col] represents the cell at (row, col).
      */
     private Cell[][] grid;
@@ -63,10 +71,23 @@ public class Board {
      * @throws IllegalArgumentException if size <= 0
      */
     public Board(int size) {
+        this(size, new Random());
+    }
+
+    /**
+     * Creates a new board of the specified size using the provided source of randomness.
+     *
+     * @param size the board size (must be > 0)
+     * @param random the source of randomness for tile placement
+     * @throws IllegalArgumentException if size <= 0
+     * @throws NullPointerException if random is null
+     */
+    Board(int size, Random random) {
         if (size <= 0) {
             throw new IllegalArgumentException("Board size must be positive: " + size);
         }
         this.size = size;
+        this.random = Objects.requireNonNull(random, "Random cannot be null");
         this.grid = new Cell[size][size];
         this.score = 0;
         initializeEmpty();
@@ -81,6 +102,7 @@ public class Board {
      */
     public Board(Board other) {
         this.size = other.size;
+        this.random = new Random();
         this.grid = new Cell[size][size];
         this.score = other.score;
         for (int r = 0; r < size; r++) {
@@ -267,18 +289,27 @@ public class Board {
 
     public boolean move(Direction direction) {
         movementSolver = new MovementSolver(this);
-        boolean moved = switch (direction) {
-            case UP -> movementSolver.resolve(Direction.UP).move(this);
-            case DOWN -> movementSolver.resolve(Direction.DOWN).move(this);
-            case LEFT -> movementSolver.resolve(Direction.LEFT).move(this);
-            case RIGHT -> movementSolver.resolve(Direction.RIGHT).move(this);
-        };
+        boolean moved = false;
+
+        switch (direction) {
+            case UP:
+                moved = movementSolver.resolve(Direction.UP).move(this);
+                break;
+            case DOWN:
+                moved = movementSolver.resolve(Direction.DOWN).move(this);
+                break;
+            case LEFT:
+                moved = movementSolver.resolve(Direction.LEFT).move(this);
+                break;
+            case RIGHT:
+                moved = movementSolver.resolve(Direction.RIGHT).move(this);
+                break;
+        }
+
         if (moved) {
             addRandomTile(); // Add new random tile after successful move
         }
         return moved;
-
-
     }
 
     /**
@@ -289,17 +320,23 @@ public class Board {
      * @return true if a tile was added, false if the board was full
      */
     private boolean addRandomTile() {
-        Set<Position> empty = getEmptyPositions();
+        List<Position> empty = new ArrayList<>();
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                if (grid[r][c].isEmpty()) {
+                    empty.add(new Position(r, c));
+                }
+            }
+        }
         if (empty.isEmpty()) {
             return false;
         }
 
         // Choose random position
-        int randomIndex = (int) (Math.random() * empty.size());
-        Position pos = empty.stream().skip(randomIndex).findFirst().get();
+        Position pos = empty.get(random.nextInt(empty.size()));
 
         // 90% chance of 2, 10% chance of 4 (standard 2048 rules)
-        int value = Math.random() < 0.9 ? 2 : 4;
+        int value = random.nextDouble() < 0.9 ? 2 : 4;
         grid[pos.row][pos.col] = new Cell(value);
 
         return true;
