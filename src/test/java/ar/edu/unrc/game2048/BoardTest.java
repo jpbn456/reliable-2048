@@ -4,6 +4,7 @@ import ar.edu.unrc.game2048.movement.Direction;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,9 +17,17 @@ public class BoardTest {
     private static final int FOUR = 4;
     private static final int TWO = 2;
 
+    private static Board newBoard() {
+        return new Board(FOUR, new Random(42));
+    }
+
+    private static Board newBoard(int size) {
+        return new Board(size, new Random(42));
+    }
+
     private static void fillBoard(Board board,Optional<Integer> cellValue) {
         int size = board.getSize();
-        if (cellValue.isEmpty()) {
+        if (!cellValue.isPresent()) {
             Cell cell = new Cell(1);
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
@@ -40,7 +49,7 @@ public class BoardTest {
 
     private static void fillBoardWithJumps(Board board, Optional<Integer> cellValue) {
         int size = board.getSize();
-        if (cellValue.isEmpty()) {
+        if (!cellValue.isPresent()) {
             Cell cell = new Cell(1);
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
@@ -69,14 +78,14 @@ public class BoardTest {
 
     @Test
     void initSizeBoardTest() {
-        Board board = new Board(ONE);
+        Board board = newBoard(ONE);
         boolean noEmptyCells = board.isFull();
         assertTrue(noEmptyCells);
     }
 
     @Test
     void initSizeFourBoardTest() {
-        Board board = new Board();
+        Board board = newBoard();
         boolean hasEmptyCells = board.hasEmptyCells();
         boolean isNotFull = !board.isFull();
         boolean isFourSized = board.getSize() == FOUR;
@@ -90,8 +99,16 @@ public class BoardTest {
     }
 
     @Test
+    void seededBoardsHaveSameInitialTilePlacementTest() {
+        Board firstBoard = newBoard();
+        Board secondBoard = newBoard();
+
+        assertEquals(firstBoard, secondBoard);
+    }
+
+    @Test
     void initCopyBoardTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Board copyBoard = new Board(board);
         boolean hasEmptyCells = copyBoard.hasEmptyCells();
         boolean isFourSized = copyBoard.getSize() == FOUR;
@@ -107,7 +124,7 @@ public class BoardTest {
 
     @Test
     void setCellPosTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = new Cell(FOUR);
         int row = 3;
         int col = 3;
@@ -120,7 +137,7 @@ public class BoardTest {
 
     @Test
     void setCellAtInvalidPosTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = new Cell(FOUR);
         int row = 4;
         int col = 5;
@@ -129,7 +146,7 @@ public class BoardTest {
 
     @Test
     void setCellAtInvalidPosTest2() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = new Cell(FOUR);
         int row = -1;
         int col = 5;
@@ -138,7 +155,7 @@ public class BoardTest {
 
     @Test
     void setCellAtInvalidPosTest3() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = new Cell(FOUR);
         int row = -1;
         int col = -5;
@@ -147,7 +164,7 @@ public class BoardTest {
 
     @Test
     void setCellAtInvalidPosTest4() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = new Cell(FOUR);
         int row = 1;
         int col = -5;
@@ -156,7 +173,7 @@ public class BoardTest {
 
     @Test
     void setCellAtInvalidPosTest5() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = new Cell(FOUR);
         int row = -1;
         int col = 2;
@@ -165,7 +182,7 @@ public class BoardTest {
 
     @Test
     void setNullCellTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = null;
         int row = 3;
         int col = 3;
@@ -174,7 +191,7 @@ public class BoardTest {
 
     @Test
     void setWiningBoardTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = new Cell(2048);
         int row = 3;
         int col = 3;
@@ -185,7 +202,7 @@ public class BoardTest {
 
     @Test
     void setLosingBoardTest() {
-        Board board = new Board(THREE);
+        Board board = newBoard(THREE);
         fillBoard(board, Optional.empty());
         boolean isLosingBoard = board.isLosingBoard();
         assertTrue(isLosingBoard);
@@ -193,7 +210,7 @@ public class BoardTest {
 
     @Test
     void setRightNotLosingBoardTest() {
-        Board board = new Board();
+        Board board = newBoard();
         fillBoard(board,Optional.empty());
         Cell cell = new Cell(1);
         board.setCell(0, 1, cell);
@@ -203,7 +220,7 @@ public class BoardTest {
 
     @Test
     void setDownNotLosingBoardTest() {
-        Board board = new Board();
+        Board board = newBoard();
         fillBoard(board,Optional.empty());
         Cell cell = new Cell(1);
         board.setCell(1, 0, cell);
@@ -213,7 +230,7 @@ public class BoardTest {
 
     @Test
     void moveUpTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Optional<Integer> value = Optional.of(ONE);
         fillBoard(board, value);
         int previousScore = board.getScore();
@@ -233,7 +250,7 @@ public class BoardTest {
 
     @Test
     void moveUpNotFullBoardTest() {
-        Board board = new Board();
+        Board board = newBoard();
         fillBoardWithJumps(board, Optional.of(ONE));
         int previousScore = board.getScore();
         int previousEmptyPos = board.getEmptyPositions().size();
@@ -251,7 +268,7 @@ public class BoardTest {
 
     @Test
     void moveDownTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Optional<Integer> value = Optional.of(ONE);
         fillBoard(board, value);
         int previousScore = board.getScore();
@@ -271,7 +288,7 @@ public class BoardTest {
 
     @Test
     void moveDownWithJumpsTest() {
-        Board board = new Board();
+        Board board = newBoard();
         fillBoardWithJumps(board, Optional.of(ONE));
         int previousScore = board.getScore();
         int previousEmptyPos = board.getEmptyPositions().size();
@@ -289,7 +306,7 @@ public class BoardTest {
 
     @Test
     void moveLeftTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Optional<Integer> value = Optional.of(ONE);
         fillBoard(board, value);
         int previousScore = board.getScore();
@@ -309,7 +326,7 @@ public class BoardTest {
 
     @Test
     void moveLeftWithJumpsTest() {
-        Board board = new Board();
+        Board board = newBoard();
         fillBoardWithJumps(board, Optional.of(TWO));
         int previousScore = board.getScore();
         int previousEmptyPos = board.getEmptyPositions().size();
@@ -327,7 +344,7 @@ public class BoardTest {
 
     @Test
     void moveRightTest() {
-        Board board = new Board();
+        Board board = newBoard();
         Optional<Integer> value = Optional.of(ONE);
         fillBoard(board, value);
         int previousScore = board.getScore();
@@ -347,7 +364,7 @@ public class BoardTest {
 
     @Test
     void moveRightWithJumpsTest() {
-        Board board = new Board();
+        Board board = newBoard();
         fillBoardWithJumps(board, Optional.of(FOUR));
         int previousScore = board.getScore();
         int previousEmptyPos = board.getEmptyPositions().size();
@@ -365,15 +382,15 @@ public class BoardTest {
 
     @Test
     void boardEqualsSelfTest() {
-        Board board = new Board(THREE);
+        Board board = newBoard(THREE);
         boolean isEqual = board.equals(board);
         assertTrue(isEqual);
     }
 
     @Test
     void boardEqualsTest() {
-        Board board1 = new Board(THREE);
-        Board board2 = new Board(THREE);
+        Board board1 = newBoard(THREE);
+        Board board2 = newBoard(THREE);
         Optional<Integer> value = Optional.of(1);
         fillBoard(board1, value);
         fillBoard(board2, value);
@@ -383,8 +400,8 @@ public class BoardTest {
 
     @Test
     void boardNotEqualsTest() {
-        Board board1 = new Board(THREE);
-        Board board2 = new Board(THREE);
+        Board board1 = newBoard(THREE);
+        Board board2 = newBoard(THREE);
         Optional<Integer> value = Optional.of(1);
         fillBoard(board1, value);
         value = Optional.of(2);
@@ -395,29 +412,29 @@ public class BoardTest {
 
     @Test
     void boardNotEqualSizeTest() {
-        Board board1 = new Board(THREE);
-        Board board2 = new Board(TWO);
+        Board board1 = newBoard(THREE);
+        Board board2 = newBoard(TWO);
         boolean isNotEqual = !board1.equals(board2);
         assertTrue(isNotEqual);
     }
 
     @Test
     void boardNullEqualsTest() {
-        Board board = new Board(THREE);
+        Board board = newBoard(THREE);
         boolean isNotEqual = !board.equals(null);
         assertTrue(isNotEqual);
     }
 
     @Test
     void boardClassNotEqualsTest() {
-        Board board = new Board(THREE);
+        Board board = newBoard(THREE);
         boolean isNotEqual = !board.equals(THREE);
         assertTrue(isNotEqual);
     }
 
     @Test
     void toStringBoardTest() {
-        Board board = new Board(TWO);
+        Board board = newBoard(TWO);
         Optional<Integer> value = Optional.of(1);
         fillBoard(board, value);
         StringBuilder resultString =
@@ -507,7 +524,7 @@ public class BoardTest {
 
     @Test
     void setGridOutSizedTest(){
-        Board board = new Board();
+        Board board = newBoard();
         int size = TWO;
         Cell[][] grid =  new Cell[size][size];
         assertThrows(IllegalArgumentException.class, ()-> board.setGrid(grid));
@@ -515,7 +532,7 @@ public class BoardTest {
 
     @Test
     void moveUpAndMakeNoMove(){
-        Board board = new Board();
+        Board board = newBoard();
         fillBoard(board, Optional.empty());
         boolean move = board.move(Direction.UP);
         assertFalse(move);
@@ -523,7 +540,7 @@ public class BoardTest {
 
     @Test
     void notCreateRandomTileTest(){
-        Board board = new Board();
+        Board board = newBoard();
         fillBoard(board, Optional.of(ONE));
         boolean move = board.move(Direction.UP);
         boolean maxValueTwoOrFour = false;
@@ -542,7 +559,7 @@ public class BoardTest {
 
     @Test
     void setCellThrowsColumnIsBoardSize() {
-        Board board = new Board();
+        Board board = newBoard();
         Cell cell = new Cell(FOUR);
         int validRow = ONE;
         int invalidColumn = board.getSize();
@@ -552,34 +569,34 @@ public class BoardTest {
 
     @Test
     void getCellThrowsExactExceptionForInvalidPosition() {
-        Board board = new Board();
+        Board board = newBoard();
         assertThrowsExactly(IndexOutOfBoundsException.class, () -> board.getCell(-1, 0));
     }
 
     @Test
     void setCellThrowsExactExceptionForInvalidPosition() {
-        Board board = new Board();
+        Board board = newBoard();
         assertThrowsExactly(IndexOutOfBoundsException.class,
                 () -> board.setCell(-1, 0, new Cell(FOUR)));
     }
 
     @Test
     void setCellThrowsWhenRowEqualsBoardSize() {
-        Board board = new Board();
+        Board board = newBoard();
         assertThrowsExactly(IndexOutOfBoundsException.class,
                 () -> board.setCell(board.getSize(), 0, new Cell(FOUR)));
     }
 
     @Test
     void setCellThrowsWhenColumnEqualsBoardSize() {
-        Board board = new Board();
+        Board board = newBoard();
         assertThrowsExactly(IndexOutOfBoundsException.class,
                 () -> board.setCell(0, board.getSize(), new Cell(FOUR)));
     }
 
     @Test
     void boardIsNotLosingWhenLastTwoColumnsCanMerge() {
-        Board board = new Board(TWO);
+        Board board = newBoard(TWO);
         board.setCell(0, 0, new Cell(2));
         board.setCell(0, 1, new Cell(4));
         board.setCell(1, 0, new Cell(8));
