@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="
+             http://maven.apache.org/POM/4.0.0
+             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ar.edu.unrc</groupId>
@@ -13,22 +16,29 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <junit.jupiter.version>5.9.2</junit.jupiter.version>
         <junit.vintage.version>5.9.2</junit.vintage.version>
-        <evosuiteVersion>1.0.6</evosuiteVersion>
+        <evosuite.version>1.0.6</evosuite.version>
+        <pitest.version>1.15.0</pitest.version>
+        <pitest.junit5.version>1.2.0</pitest.junit5.version>
     </properties>
 
     <build>
         <plugins>
+
+            <!-- JaCoCo -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.10</version>
+
                 <configuration>
                     <excludes>
                         <exclude>**/MainCLI*</exclude>
                     </excludes>
                 </configuration>
+
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -36,6 +46,7 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+
                     <execution>
                         <id>report</id>
                         <phase>prepare-package</phase>
@@ -45,68 +56,98 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- JUnit test execution -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
+
                 <configuration>
                     <includes>
                         <include>**/RegressionTest*.java</include>
                         <include>**/ErrorTest*.java</include>
                         <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
                     </includes>
                 </configuration>
             </plugin>
 
+            <!-- PIT mutation testing -->
             <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
-                <version>1.15.0</version>
+                <version>${pitest.version}</version>
+
                 <dependencies>
                     <dependency>
                         <groupId>org.pitest</groupId>
                         <artifactId>pitest-junit5-plugin</artifactId>
-                        <version>1.2.0</version>
+                        <version>${pitest.junit5.version}</version>
                     </dependency>
                 </dependencies>
+
                 <configuration>
                     <targetClasses>
                         <param>ar.edu.unrc.game2048.*</param>
                     </targetClasses>
+
                     <excludedClasses>
                         <param>ar.edu.unrc.game2048.MainCLI*</param>
                     </excludedClasses>
+
                     <targetTests>
                         <param>ar.edu.unrc.game2048.*Test</param>
                         <param>ar.edu.unrc.game2048.*Tests</param>
-                        <param>randoopTests.*Tests</param>
                         <param>randoopTests.*Test</param>
+                        <param>randoopTests.*Tests</param>
                         <param>evosuite.*Test</param>
                     </targetTests>
-                    <threads>4</threads>
+
+                    <!-- Reduce parallel memory consumption -->
+                    <threads>2</threads>
+
+                    <!-- Timeout = normal test duration × factor + constant -->
+                    <timeoutFactor>3.0</timeoutFactor>
+                    <timeoutConstant>15000</timeoutConstant>
+
+                    <!-- Memory assigned to PIT child JVMs -->
+                    <jvmArgs>
+                        <jvmArg>-Xms512m</jvmArg>
+                        <jvmArg>-Xmx3g</jvmArg>
+                    </jvmArgs>
+
                     <timestampedReports>false</timestampedReports>
+
                     <outputFormats>
                         <format>HTML</format>
                         <format>XML</format>
                     </outputFormats>
+
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
     <profiles>
         <profile>
             <id>evosuite</id>
+
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.evosuite.plugins</groupId>
                         <artifactId>evosuite-maven-plugin</artifactId>
-                        <version>${evosuiteVersion}</version>
+                        <version>${evosuite.version}</version>
+
                         <executions>
                             <execution>
-                                <goals> <goal> prepare </goal> </goals>
-                                <phase> process-test-classes </phase>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>prepare</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
@@ -116,45 +157,58 @@
     </profiles>
 
     <dependencies>
+
+        <!-- Randoop -->
         <dependency>
             <groupId>com.github.randoop</groupId>
             <artifactId>randoop</artifactId>
             <version>4.3.4</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/randoop-all-4.3.4.jar</systemPath>
+            <systemPath>
+                ${project.basedir}/lib/randoop-all-4.3.4.jar
+            </systemPath>
         </dependency>
+
+        <!-- JUnit 5 API -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- JUnit 5 engine -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- JUnit parameterized tests -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-standalone-runtime</artifactId>
-            <version>${evosuiteVersion}</version>
-            <scope>test</scope>
-        </dependency>
 
-        <!-- JUnit Vintage for running JUnit 4 tests -->
+        <!-- JUnit 4 compatibility -->
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
             <version>${junit.vintage.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- EvoSuite runtime -->
+        <dependency>
+            <groupId>org.evosuite</groupId>
+            <artifactId>evosuite-standalone-runtime</artifactId>
+            <version>${evosuite.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
