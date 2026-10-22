@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="
@@ -171,8 +172,12 @@
     </profiles>
 
     <dependencies>
-
-        <!-- Randoop -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.github.randoop</groupId>
             <artifactId>randoop</artifactId>
@@ -214,15 +219,11 @@
             <version>${junit.vintage.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- EvoSuite runtime -->
         <dependency>
-            <groupId>org.evosuite</groupId>
-            <artifactId>evosuite-standalone-runtime</artifactId>
-            <version>${evosuite.version}</version>
-            <scope>test</scope>
-        </dependency>
-
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+        <version>1.10.0</version>
+</dependency>
     </dependencies>
 
 </project>
