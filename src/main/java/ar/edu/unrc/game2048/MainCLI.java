@@ -73,6 +73,8 @@ public class MainCLI {
                     continue;
             }
 
+            assert board.repOk();
+
             if (moved) {
                 System.out.println("Tile moved!");
             } else {

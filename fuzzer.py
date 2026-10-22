@@ -47,7 +47,7 @@ class CLIRunner(Runner):
     PASS, FAIL, or UNRESOLVED.
     """
 
-    COMMAND = ['java', '-cp', './target/classes', 'ar.edu.unrc.game2048.MainCLI']
+    COMMAND = ['java','-ea','-cp', './target/classes', 'ar.edu.unrc.game2048.MainCLI']
     TIMEOUT = 10  # seconds
 
     def run(self, inp: str) -> Tuple[subprocess.CompletedProcess, str]:
@@ -109,20 +109,12 @@ class RandomFuzzer(Fuzzer):
         self.max_length = max_length
 
     def fuzz(self) -> str:
-        """
-        TODO: Implement this method.
-
-        Return a string representing a sequence of moves for the 2048 CLI.
-        Each key must be on its own line (followed by '\\n').
-        The sequence must end with the quit key ('q') on its own line.
-
-        Use `self.min_length` and `self.max_length` to decide how many moves
-        to generate, and pick keys randomly from the KEYS list.
-
-        Example output for a sequence of 3 moves:
-            'w\\na\\nd\\nq\\n'
-        """
-        raise NotImplementedError
+        length = random.randint(self.min_length,self.max_length)
+        result = 'q\n'
+        for _ in range(length):
+            addition = random.choice(KEYS) + '\n'
+            result = addition + result
+        return result
 
 # ---------------------------------------------------------------------------
 # Main: run the fuzzer and report results

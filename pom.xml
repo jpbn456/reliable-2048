@@ -65,11 +65,14 @@
 
                 <configuration>
                     <includes>
-                        <include>**/RegressionTest*.java</include>
-                        <include>**/ErrorTest*.java</include>
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
                     </includes>
+                    <excludes>
+                        <!-- EvoSuite tests run only with the evosuite profile. -->
+                        <exclude>**/*_ESTest.java</exclude>
+                        <exclude>**/*_ESTest_scaffolding.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
@@ -150,6 +153,17 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+
+                    <!-- Run only generated EvoSuite tests when this profile is active. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration combine.self="override">
+                            <includes>
+                                <include>**/*_ESTest.java</include>
+                            </includes>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
